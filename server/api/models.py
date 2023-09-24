@@ -1,6 +1,8 @@
-from sqlalchemy.orm import validates
-from server.app.app import db,
 
+from sqlalchemy.orm import validates
+from api import *
+
+db=SQLAlchemy()
 
 
 class Restaurant(db.Model):
@@ -11,8 +13,7 @@ class Restaurant(db.Model):
     address=db.Column(db.String)
 
     restaurant_pizza=db.relationship('RestaurantPizza',backref='restaurant')
-    # pizzas=db.association_proxy('restaurant_pizzas','pizza',creator=lambda us: RestaurantPizza(pizza=us))
-
+   
     def __repr__(self):
         return f'< Restaurant {self.name} | Address: {self.address}>'
     
@@ -33,8 +34,7 @@ class Pizza(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
     restaurant_pizza=db.relationship('RestaurantPizza',backref='pizza')
-    # pizzas=db.association_proxy('restaurant_pizzas','restaurant',creator=lambda gm: RestaurantPizza(restaurant=gm))
-
+  
     def __repr__(self):
         return f'< Pizza {self.name} | Ingredients: {self.ingredients}>'
     

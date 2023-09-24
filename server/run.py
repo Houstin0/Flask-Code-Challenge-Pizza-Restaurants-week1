@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-f
+from api import app
 
 
 if __name__ == '__main__':
