@@ -1,6 +1,7 @@
 from sqlalchemy.orm import validates
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
+from flask import make_response,jsonify
 
 db=SQLAlchemy()
 
@@ -70,6 +71,13 @@ class RestaurantPizza(db.Model,SerializerMixin):
         if price >= 1 and price <= 30:
             return price
         else:
-            raise AssertionError("Price must be between 1 and 30.")
+            response_dict={
+                "errors": ["validation errors"]
+            }
+            response=make_response(
+                jsonify(response_dict),
+                403
+            )
+            return response
 
     

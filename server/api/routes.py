@@ -1,7 +1,7 @@
 from api.models import Pizza,Restaurant,RestaurantPizza
 from api.models import db
 from api.app import api
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 from flask import make_response,request,jsonify
 
 
@@ -35,6 +35,11 @@ class Restaurants(Resource):
             200
         )
         return response
+    
+    def post(self):
+        data=request.get_json()
+
+
 
 api.add_resource(Restaurants, '/restaurants')
 
@@ -62,6 +67,22 @@ class RestaurantByID(Resource):
                 404
             )
             return response
+    def patch(self,id):
+        restaurant= Restaurant.query.filter_by(id=id).first()
+        data=request.get_json()
+
+        for attr in data:
+            setattr(restaurant,attr,data.get(attr))
+
+        db.session.add(restaurant)
+        db.session.commit()
+
+        response_dict=restaurant.to_dict()
+        response=make_response(
+            jsonify(response_dict),
+            200
+        )    
+        return response
         
     def delete(self, id):
         restaurant = Restaurant.query.get(id)
@@ -99,6 +120,18 @@ class Pizzas(Resource):
 api.add_resource(Pizzas, '/pizzas')
 
 class RestaurantPizzas(Resource):
+    def get(self):
+        restaurants_pizzas_dicts = []
+        for restaurant_pizza in RestaurantPizza.query.all():
+            restaurant_dict = restaurant_pizza.to_dict()
+            restaurants_pizzas_dicts.append(restaurant_dict)
+
+        response = make_response(
+            jsonify(restaurants_pizzas_dicts),
+            200
+        )
+        return response
+     
     def post(self):
         data=request.get_json()
         new_restaurant_pizza=RestaurantPizza(
@@ -108,13 +141,11 @@ class RestaurantPizzas(Resource):
         ) 
         db.session.add(new_restaurant_pizza)
         db.session.commit()
-
+        
         response = make_response(
             new_restaurant_pizza.to_dict(),
-            201 
+             201 
         )
         return response
-
-
-
+    
 api.add_resource(RestaurantPizzas, '/restaurant_pizzas')
