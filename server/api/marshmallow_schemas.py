@@ -1,5 +1,5 @@
-from api import app
-from .models import Restaurant,Pizza,RestaurantPizza
+from app import app
+from models import Restaurant,Pizza,RestaurantPizza
 from flask_marshmallow import Marshmallow
 
 ma=Marshmallow(app)

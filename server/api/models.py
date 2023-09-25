@@ -1,6 +1,6 @@
 
 from sqlalchemy.orm import validates
-from api import *
+from flask_sqlalchemy import SQLAlchemy
 
 db=SQLAlchemy()
 
@@ -12,7 +12,8 @@ class Restaurant(db.Model):
     name=db.Column(db.String,unique=True)
     address=db.Column(db.String)
 
-    restaurant_pizza=db.relationship('RestaurantPizza',backref='restaurant')
+    restaurant_pizzas = db.relationship('RestaurantPizza', back_populates='restaurant', overlaps="restaurant_pizza")
+
    
     def __repr__(self):
         return f'< Restaurant {self.name} | Address: {self.address}>'
@@ -33,8 +34,8 @@ class Pizza(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    restaurant_pizza=db.relationship('RestaurantPizza',backref='pizza')
-  
+    restaurant_pizzas = db.relationship('RestaurantPizza', back_populates='pizza')
+
     def __repr__(self):
         return f'< Pizza {self.name} | Ingredients: {self.ingredients}>'
     
@@ -48,8 +49,9 @@ class RestaurantPizza(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    pizza=db.relationship('Pizza',backref='restaurant_pizzas')
-    restaurant=db.relationship('Restaurant',backref='restaurant_pizzas')
+    pizza = db.relationship('Pizza', back_populates='restaurant_pizzas', overlaps="restaurant_pizza")
+    restaurant = db.relationship('Restaurant', back_populates='restaurant_pizzas', overlaps="restaurants")
+
 
     def __repr__(self):
         return f'< Restaurant Pizza Price {self.price} | Created at: {self.created_at} | Updated at: {self.updated_at} >'

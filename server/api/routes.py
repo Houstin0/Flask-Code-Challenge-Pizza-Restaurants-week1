@@ -1,6 +1,7 @@
-from .marshmallow_schemas import restaurant_schema,pizza_schema,restaurant_pizza_schema
-from .models import Pizza,Restaurant,RestaurantPizza
-from api import db, api,app
+from marshmallow_schemas import restaurant_schema,pizza_schema,restaurant_pizza_schema
+from models import Pizza,Restaurant,RestaurantPizza
+from models import db
+from app import api
 from flask_restful import Resource
 from flask import make_response,request
 
@@ -39,4 +40,33 @@ class Restaurants(Resource):
             name=request.form['name'],
             address=request.form['body']
         )
-        db.session
+        db.session.add(new_restaurant)
+        db.session.commit()
+
+        response=make_response(
+            restaurant_schema.dump(new_restaurant),
+            201
+        )
+        return response
+    
+api.add_resource(Restaurants,'/restaurants')
+
+class RestaurantByID(Resource):
+    def get(self,id):
+
+        restaurant=Restaurant.query.filter_by(id=id).first()
+        if restaurant:
+            response=make_response(
+                restaurant_schema.dump(restaurant),
+                200
+            )
+            return response
+        else:
+            response_dict={
+                "error": "Restaurant not found"
+            }
+            response=make_response(
+                response_dict,
+                404
+            )
+            return response
