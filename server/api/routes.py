@@ -1,9 +1,10 @@
-from marshmallow_schemas import restaurant_schema,pizza_schema,restaurant_pizza_schema
-from models import Pizza,Restaurant,RestaurantPizza
-from models import db
-from app import api
-from flask_restful import Resource
-from flask import make_response,request
+from api.models import Pizza,Restaurant,RestaurantPizza
+from api.models import db
+from api.app import api
+from flask_restful import Resource, reqparse
+from flask import make_response,request,jsonify
+
+
 
 class Index(Resource):
 
@@ -14,7 +15,7 @@ class Index(Resource):
         }
 
         response = make_response(
-            response_dict,
+            jsonify(response_dict),
             200,
         )
 
@@ -23,50 +24,97 @@ class Index(Resource):
 api.add_resource(Index, '/')
 
 class Restaurants(Resource):
-
     def get(self):
+        restaurants_dicts = []
+        for restaurant in Restaurant.query.all():
+            restaurant_dict = restaurant.to_dict()
+            restaurants_dicts.append(restaurant_dict)
 
-        restaurants=Restaurant.query.all()
-
-        response=make_response(
-            restaurant_schema.dump(restaurants),
+        response = make_response(
+            jsonify(restaurants_dicts),
             200
         )
         return response
-    
-    def post(self):
 
-        new_restaurant=Restaurant(
-            name=request.form['name'],
-            address=request.form['body']
-        )
-        db.session.add(new_restaurant)
-        db.session.commit()
-
-        response=make_response(
-            restaurant_schema.dump(new_restaurant),
-            201
-        )
-        return response
-    
-api.add_resource(Restaurants,'/restaurants')
+api.add_resource(Restaurants, '/restaurants')
 
 class RestaurantByID(Resource):
-    def get(self,id):
-
-        restaurant=Restaurant.query.filter_by(id=id).first()
+    def get(self, id):
+        restaurant = Restaurant.query.filter_by(id=id).first()
         if restaurant:
-            response=make_response(
-                restaurant_schema.dump(restaurant),
+            response_dict = {
+                "id": restaurant.id,
+                "name": restaurant.name,
+                "address": restaurant.address,
+                "pizzas": [pizza.to_dict() for pizza in restaurant.pizzas]
+            }
+            response = make_response(
+                jsonify(response_dict),
                 200
             )
             return response
         else:
-            response_dict={
+            response_dict = {
                 "error": "Restaurant not found"
             }
-            response=make_response(
-                response_dict,
+            response = make_response(
+                jsonify(response_dict),
                 404
             )
             return response
+        
+    def delete(self, id):
+        restaurant = Restaurant.query.get(id)
+        if restaurant:
+
+            for restaurant_pizza in restaurant.restaurant_pizzas:
+                db.session.delete(restaurant_pizza)
+            db.session.delete(restaurant)
+            db.session.commit()
+
+            response = make_response('', 204) 
+            return response
+        else:
+            response_dict = {
+                "error": "Restaurant not found"
+            }
+            response = make_response(
+                jsonify(response_dict),
+                404
+            )
+            return response
+
+api.add_resource(RestaurantByID, '/restaurants/<int:id>')
+
+class Pizzas(Resource):
+    def get(self):
+        pizzas = Pizza.query.all()
+        pizzas_dicts = [pizza.to_dict() for pizza in pizzas]
+        response = make_response(
+            jsonify(pizzas_dicts),
+            200
+        )
+        return response
+
+api.add_resource(Pizzas, '/pizzas')
+
+class RestaurantPizzas(Resource):
+    def post(self):
+        data=request.get_json()
+        new_restaurant_pizza=RestaurantPizza(
+            price=data.get('price'),
+            pizza_id= data.get("pizza_id"),
+            restaurant_id= data.get("restaurant_id"),
+        ) 
+        db.session.add(new_restaurant_pizza)
+        db.session.commit()
+
+        response = make_response(
+            new_restaurant_pizza.to_dict(),
+            201 
+        )
+        return response
+
+
+
+api.add_resource(RestaurantPizzas, '/restaurant_pizzas')
