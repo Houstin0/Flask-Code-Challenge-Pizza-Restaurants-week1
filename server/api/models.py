@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
+
 from sqlalchemy.orm import validates
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
-from flask import make_response,jsonify
+
 
 db=SQLAlchemy()
 
@@ -9,15 +11,15 @@ db=SQLAlchemy()
 class Restaurant(db.Model,SerializerMixin):
     __tablename__="restaurants"
 
-    serialize_rules = ('-restaurant_pizzas','-pizzas', )
+    serialize_rules = ('-restaurant_pizzas','-restaurant_pizzas.pizzas','-pizzas.restaurant_pizzas','-pizzas' )
 
 
     id=db.Column(db.Integer,primary_key=True)
     name=db.Column(db.String,unique=True)
     address=db.Column(db.String)
 
-    restaurant_pizzas = db.relationship('RestaurantPizza', back_populates='restaurant', overlaps="restaurant_pizza")
-    pizzas = db.relationship('Pizza', secondary='restaurant_pizzas', back_populates='restaurants')
+    restaurant_pizzas = db.relationship('RestaurantPizza', back_populates='restaurants', overlaps="restaurant_pizza")
+    pizzas = db.relationship('Pizza', secondary='restaurant_pizzas', back_populates='restaurants',overlaps="restaurant_pizzas")
 
    
     def __repr__(self):
@@ -26,7 +28,7 @@ class Restaurant(db.Model,SerializerMixin):
     @validates('name')
     def check_name(self,key,name):
         if len(name) > 50:
-            raise AssertionError("Name must be less than 50 words in length.")
+            raise ValueError("Name must be less than 50 words in length.",403)
         return name
 
     
@@ -41,8 +43,8 @@ class Pizza(db.Model,SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    restaurant_pizzas = db.relationship('RestaurantPizza', back_populates='pizza')
-    restaurants = db.relationship('Restaurant', secondary='restaurant_pizzas', back_populates='pizzas')
+    restaurant_pizzas = db.relationship('RestaurantPizza', back_populates='pizzas',overlaps="pizzas")
+    restaurants = db.relationship('Restaurant', secondary='restaurant_pizzas', back_populates='pizzas',overlaps="restaurant_pizzas")
 
     def __repr__(self):
         return f'< Pizza {self.name} | Ingredients: {self.ingredients}>'
@@ -50,7 +52,7 @@ class Pizza(db.Model,SerializerMixin):
 class RestaurantPizza(db.Model,SerializerMixin):
     __tablename__="restaurant_pizzas"
 
-    serialize_rules = ('-restaurant_pizzas', '-pizzas', '-restaurants')
+    serialize_rules = ('-pizzas', '-restaurants')
 
     id=db.Column(db.Integer,primary_key=True)
     pizza_id=db.Column(db.Integer,db.ForeignKey("pizzas.id"))
@@ -59,8 +61,8 @@ class RestaurantPizza(db.Model,SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    pizza = db.relationship('Pizza', back_populates='restaurant_pizzas', overlaps="restaurant_pizza")
-    restaurant = db.relationship('Restaurant', back_populates='restaurant_pizzas', overlaps="restaurants")
+    pizzas = db.relationship('Pizza', back_populates='restaurant_pizzas',overlaps="pizzas,restaurants")
+    restaurants = db.relationship('Restaurant', back_populates='restaurant_pizzas',overlaps="pizzas,restaurants")
 
 
     def __repr__(self):
@@ -68,16 +70,9 @@ class RestaurantPizza(db.Model,SerializerMixin):
     
     @validates('price')
     def check_price(self, key, price):
-        if price >= 1 and price <= 30:
+        if 1 <= price <= 30:
             return price
         else:
-            response_dict={
-                "errors": ["validation errors"]
-            }
-            response=make_response(
-                jsonify(response_dict),
-                403
-            )
-            return response
+            raise ValueError("Price must be between 1 and 30",403)
 
     

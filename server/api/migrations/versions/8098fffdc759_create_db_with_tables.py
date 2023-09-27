@@ -1,8 +1,8 @@
-"""created modules with relationship and validation
+"""create db with tables
 
-Revision ID: d902363adb53
+Revision ID: 8098fffdc759
 Revises: 
-Create Date: 2023-09-25 03:43:51.785047
+Create Date: 2023-09-26 12:37:06.412929
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd902363adb53'
+revision = '8098fffdc759'
 down_revision = None
 branch_labels = None
 depends_on = None
