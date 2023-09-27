@@ -10,12 +10,12 @@ this repository contains a Pizza Restaurant domain with a flask api containing t
 6. Run the backend api  using python3 run.py or flask run
 
 ## Packages used
--flask-restful 
--flask 
--flask-migrate 
--flask-sqlalchemy
--sqlalchemy-serializer
--faker 
+- flask-restful 
+- flask 
+- flask-migrate 
+- flask-sqlalchemy
+- sqlalchemy-serializer
+- faker 
 
 ## Routes
 - GET /restaurants
