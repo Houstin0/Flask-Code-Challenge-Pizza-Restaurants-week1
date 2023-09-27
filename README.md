@@ -18,11 +18,11 @@ this repository contains a Pizza Restaurant domain with a flask api containing t
 - faker 
 
 ## Routes
-- GET /restaurants
-- GET /restaurants/:id
-- DELETE /restaurants/:id
-- GET /pizzas
-- POST /restaurant_pizzas
+- GET /restaurants - returns all the restaurants in the database.
+- GET /restaurants/:id - returns a specified single restaurant in the database.
+- DELETE /restaurants/:id - deletes a specified single restaurant in the database.
+- GET /pizzas - returns all the pizzas in the database.
+- POST /restaurant_pizzas - posts a restaurant_pizza to the database .
 
 ##  Author
 Houstin Angwenyi
