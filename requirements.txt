@@ -21,5 +21,5 @@ pytz
 six
 sqlalchemy
 sqlalchemy-serializer
-typing-extensions=
+typing-extensions
 werkzeug
