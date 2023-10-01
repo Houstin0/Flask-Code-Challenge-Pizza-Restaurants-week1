@@ -1,6 +1,8 @@
 # Flask-Code-Challenge-Pizza-Restaurants-week1
 this repository contains a Pizza Restaurant domain with a flask api containing three models Restaurant,Pizza and RestaurantPizza.
 
+You can view the deployed api at https://restaurant-pizza-db.onrender.com
+
 ##  Project Setup
 1. Clone the repository to your local machine using git clone.
 2. Navigate to the repository's directory.
