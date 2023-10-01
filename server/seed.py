@@ -2,7 +2,7 @@
 
 from faker import Faker
 from api.models import db, Restaurant, Pizza, RestaurantPizza
-from api import app
+from api.app import app
 import random
 
 with app.app_context():

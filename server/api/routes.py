@@ -4,7 +4,7 @@ from flask_restful import Resource
 from flask import make_response,request,jsonify
 from .models import Pizza,Restaurant,RestaurantPizza
 from .models import db
-from api import api
+from .app import api
 
 class Index(Resource):
     def get(self):

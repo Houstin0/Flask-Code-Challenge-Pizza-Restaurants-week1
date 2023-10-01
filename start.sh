@@ -1,0 +1,1 @@
+gunicorn server/api/app:app -w 1 --log-file -
