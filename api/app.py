@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 
-from flask_restful import Resource
-from flask import make_response,request,jsonify
-from .models import Pizza,Restaurant,RestaurantPizza
-from .models import db
-from .app import api
+from flask import Flask,make_response,request,jsonify
+from flask_restful import Api,Resource
+from flask_migrate import Migrate
+from models import db,Pizza,Restaurant,RestaurantPizza
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://restaurant_pizza_db_sio0_user:ru9teXZMG9ZndlYP0Ia91USlv6rHElP6@dpg-ckcvg6uct0pc73c8vhng-a.ohio-postgres.render.com/restaurant_pizza_db_sio0"
+
+db.init_app(app)
+migrate = Migrate(app, db)
+
+api = Api(app)
 
 class Index(Resource):
     def get(self):
@@ -182,3 +189,7 @@ class RestaurantPizzas(Resource):
 
     
 api.add_resource(RestaurantPizzas, '/restaurant_pizzas')
+
+
+if __name__ == '__main__':
+    app.run(port=5555,debug=True)

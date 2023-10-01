@@ -54,3 +54,5 @@ with app.app_context():
             restaurant_pizzas.append(new_restaurant_pizza)
     db.session.add_all(restaurant_pizzas)
     db.session.commit()
+
+    print("seeded")
