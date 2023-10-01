@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 from faker import Faker
-from api.models import db, Restaurant, Pizza, RestaurantPizza
-from api.app import app
+from models import db, Restaurant, Pizza, RestaurantPizza
+from app import app
 import random
 
 with app.app_context():
